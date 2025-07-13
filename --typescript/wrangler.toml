@@ -14,4 +14,4 @@ workers_dev = false
 route = "https://failtrack.example.com/api/*" 
 
 [assets]
-directory = "--typescript/dist"
+directory = "dist"
