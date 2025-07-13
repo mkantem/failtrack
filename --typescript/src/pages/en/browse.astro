@@ -51,6 +51,7 @@ import { useState, useEffect } from 'react';
         });
       }
     }
+    
     async function fetchRandom() {
       const res = await fetch('/api/random');
       const failure = await res.json();
