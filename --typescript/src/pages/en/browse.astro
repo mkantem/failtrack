@@ -1,0 +1,84 @@
+---
+import Navbar from '../../components/Navbar.astro';
+import FailureCard from '../../components/FailureCard.astro';
+import { useState, useEffect } from 'react';
+---
+<Navbar />
+<main class="max-w-3xl mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">{import('../../locales/en.json').then(m => m.browse.title)}</h1>
+  <form id="searchForm" class="flex flex-wrap gap-2 mb-4" on:submit={e => { e.preventDefault(); fetchFailures(); }}>
+    <input id="keyword" type="text" placeholder={import('../../locales/en.json').then(m => m.browse.searchPlaceholder)} class="flex-1 p-2 border rounded" />
+    <select id="langFilter" class="p-2 border rounded">
+      <option value="">{import('../../locales/en.json').then(m => m.browse.filterLanguage)}</option>
+      <option value="en">English</option>
+      <option value="fr">Français</option>
+    </select>
+    <button type="button" class="px-4 py-2 bg-green-600 text-white rounded" on:click={fetchRandom}>{import('../../locales/en.json').then(m => m.browse.randomButton)}</button>
+  </form>
+  <div id="failuresList">
+    <!-- FailureCard list will go here -->
+  </div>
+  <div class="flex justify-between mt-4">
+    <button id="prevPage" class="px-3 py-1 bg-gray-200 rounded" on:click={prevPage}>Prev</button>
+    <button id="nextPage" class="px-3 py-1 bg-gray-200 rounded" on:click={nextPage}>Next</button>
+  </div>
+  <script type="module">
+    let page = 1;
+    async function fetchFailures() {
+      const keyword = document.getElementById('keyword').value;
+      const language = document.getElementById('langFilter').value;
+      const res = await fetch(`/api/failures?page=${page}&keyword=${encodeURIComponent(keyword)}&language=${language}`);
+      const data = await res.json();
+      const list = document.getElementById('failuresList');
+      list.innerHTML = '';
+      if (data.length === 0) {
+        list.innerHTML = `<p class='text-gray-500'>{import('../../locales/en.json').then(m => m.browse.noResults)}</p>`;
+      } else {
+        data.forEach(failure => {
+          const card = document.createElement('div');
+          card.innerHTML = `<article class='border rounded p-4 mb-4 bg-white dark:bg-gray-800 shadow'>
+            <p class='mb-2 text-lg'>${failure.story}</p>
+            <div class='flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2'>
+              ${failure.tags ? `<span><strong>Tags:</strong> ${failure.tags}</span>` : ''}
+              ${failure.discipline ? `<span><strong>Discipline:</strong> ${failure.discipline}</span>` : ''}
+              ${failure.year ? `<span><strong>Year:</strong> ${failure.year}</span>` : ''}
+              ${failure.pseudonym ? `<span><strong>Pseudonym:</strong> ${failure.pseudonym}</span>` : ''}
+              <span><strong>Language:</strong> ${failure.language}</span>
+              <span><strong>Date:</strong> ${failure.created_at}</span>
+            </div>
+          </article>`;
+          list.appendChild(card);
+        });
+      }
+    }
+    async function fetchRandom() {
+      const res = await fetch('/api/random');
+      const failure = await res.json();
+      const list = document.getElementById('failuresList');
+      list.innerHTML = '';
+      if (failure.error) {
+        list.innerHTML = `<p class='text-gray-500'>{import('../../locales/en.json').then(m => m.browse.noResults)}</p>`;
+      } else {
+        const card = document.createElement('div');
+        card.innerHTML = `<article class='border rounded p-4 mb-4 bg-white dark:bg-gray-800 shadow'>
+          <p class='mb-2 text-lg'>${failure.story}</p>
+          <div class='flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2'>
+            ${failure.tags ? `<span><strong>Tags:</strong> ${failure.tags}</span>` : ''}
+            ${failure.discipline ? `<span><strong>Discipline:</strong> ${failure.discipline}</span>` : ''}
+            ${failure.year ? `<span><strong>Year:</strong> ${failure.year}</span>` : ''}
+            ${failure.pseudonym ? `<span><strong>Pseudonym:</strong> ${failure.pseudonym}</span>` : ''}
+            <span><strong>Language:</strong> ${failure.language}</span>
+            <span><strong>Date:</strong> ${failure.created_at}</span>
+          </div>
+        </article>`;
+        list.appendChild(card);
+      }
+    }
+    function prevPage() { if (page > 1) { page--; fetchFailures(); } }
+    function nextPage() { page++; fetchFailures(); }
+    fetchFailures();
+    document.getElementById('searchForm').addEventListener('submit', e => { e.preventDefault(); page = 1; fetchFailures(); });
+    document.getElementById('prevPage').addEventListener('click', prevPage);
+    document.getElementById('nextPage').addEventListener('click', nextPage);
+  </script>
+</main> 

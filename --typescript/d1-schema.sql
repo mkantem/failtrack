@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS failures (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  story TEXT NOT NULL,
+  tags TEXT,
+  discipline TEXT,
+  year TEXT,
+  pseudonym TEXT,
+  language TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+); 

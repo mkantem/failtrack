@@ -1,0 +1,13 @@
+name = "failtrack-api"
+type = "javascript"
+account_id = "YOUR_ACCOUNT_ID"
+workers_dev = true
+compatibility_date = "2024-06-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "failtrack"
+
+[env.production]
+workers_dev = false
+route = "https://failtrack.example.com/api/*" 

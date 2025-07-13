@@ -1,0 +1,14 @@
+---
+const { story, tags, discipline, year, pseudonym, language, created_at } = Astro.props;
+---
+<article class="border rounded p-4 mb-4 bg-white dark:bg-gray-800 shadow">
+  <p class="mb-2 text-lg">{story}</p>
+  <div class="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2">
+    {tags && <span><strong>Tags:</strong> {tags}</span>}
+    {discipline && <span><strong>Discipline:</strong> {discipline}</span>}
+    {year && <span><strong>Year:</strong> {year}</span>}
+    {pseudonym && <span><strong>Pseudonym:</strong> {pseudonym}</span>}
+    <span><strong>Language:</strong> {language}</span>
+    <span><strong>Date:</strong> {created_at}</span>
+  </div>
+</article> 
