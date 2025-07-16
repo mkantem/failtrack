@@ -6,24 +6,25 @@ import { useState, useEffect } from 'react';
 <Navbar />
 <main class="max-w-3xl mx-auto p-4">
   <h1 class="text-2xl font-bold mb-4">{import('../../locales/fr.json').then(m => m.browse.title)}</h1>
-  <form id="searchForm" class="flex flex-wrap gap-2 mb-4" on:submit={e => { e.preventDefault(); fetchFailures(); }}>
+  <form id="searchForm" class="flex flex-wrap gap-2 mb-4">
     <input id="keyword" type="text" placeholder={import('../../locales/fr.json').then(m => m.browse.searchPlaceholder)} class="flex-1 p-2 border rounded" />
     <select id="langFilter" class="p-2 border rounded">
       <option value="">{import('../../locales/fr.json').then(m => m.browse.filterLanguage)}</option>
       <option value="fr">Français</option>
       <option value="en">English</option>
     </select>
-    <button type="button" class="px-4 py-2 bg-green-600 text-white rounded" on:click={fetchRandom}>{import('../../locales/fr.json').then(m => m.browse.randomButton)}</button>
+    <button id="randomBtn" type="button" class="px-4 py-2 bg-green-600 text-white rounded">{import('../../locales/fr.json').then(m => m.browse.randomButton)}</button>
   </form>
   <div id="failuresList">
     <!-- FailureCard list will go here -->
   </div>
   <div class="flex justify-between mt-4">
-    <button id="prevPage" class="px-3 py-1 bg-gray-200 rounded" on:click={prevPage}>Précédent</button>
-    <button id="nextPage" class="px-3 py-1 bg-gray-200 rounded" on:click={nextPage}>Suivant</button>
+    <button id="prevPage" class="px-3 py-1 bg-gray-200 rounded">Précédent</button>
+    <button id="nextPage" class="px-3 py-1 bg-gray-200 rounded">Suivant</button>
   </div>
-  <script type="module">
+  <script type="module" client:load>
     let page = 1;
+
     async function fetchFailures() {
       const keyword = document.getElementById('keyword').value;
       const language = document.getElementById('langFilter').value;
@@ -41,9 +42,9 @@ import { useState, useEffect } from 'react';
             <div class='flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2'>
               ${failure.tags ? `<span><strong>Tags:</strong> ${failure.tags}</span>` : ''}
               ${failure.discipline ? `<span><strong>Discipline:</strong> ${failure.discipline}</span>` : ''}
-              ${failure.year ? `<span><strong>Année:</strong> ${failure.year}</span>` : ''}
-              ${failure.pseudonym ? `<span><strong>Pseudonyme:</strong> ${failure.pseudonym}</span>` : ''}
-              <span><strong>Langue:</strong> ${failure.language}</span>
+              ${failure.year ? `<span><strong>Year:</strong> ${failure.year}</span>` : ''}
+              ${failure.pseudonym ? `<span><strong>Pseudonym:</strong> ${failure.pseudonym}</span>` : ''}
+              <span><strong>Language:</strong> ${failure.language}</span>
               <span><strong>Date:</strong> ${failure.created_at}</span>
             </div>
           </article>`;
@@ -51,6 +52,7 @@ import { useState, useEffect } from 'react';
         });
       }
     }
+
     async function fetchRandom() {
       const res = await fetch('/api/random');
       const failure = await res.json();
@@ -65,20 +67,22 @@ import { useState, useEffect } from 'react';
           <div class='flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2'>
             ${failure.tags ? `<span><strong>Tags:</strong> ${failure.tags}</span>` : ''}
             ${failure.discipline ? `<span><strong>Discipline:</strong> ${failure.discipline}</span>` : ''}
-            ${failure.year ? `<span><strong>Année:</strong> ${failure.year}</span>` : ''}
-            ${failure.pseudonym ? `<span><strong>Pseudonyme:</strong> ${failure.pseudonym}</span>` : ''}
-            <span><strong>Langue:</strong> ${failure.language}</span>
+            ${failure.year ? `<span><strong>Year:</strong> ${failure.year}</span>` : ''}
+            ${failure.pseudonym ? `<span><strong>Pseudonym:</strong> ${failure.pseudonym}</span>` : ''}
+            <span><strong>Language:</strong> ${failure.language}</span>
             <span><strong>Date:</strong> ${failure.created_at}</span>
           </div>
         </article>`;
         list.appendChild(card);
       }
     }
+
     function prevPage() { if (page > 1) { page--; fetchFailures(); } }
     function nextPage() { page++; fetchFailures(); }
-    fetchFailures();
+
     document.getElementById('searchForm').addEventListener('submit', e => { e.preventDefault(); page = 1; fetchFailures(); });
     document.getElementById('prevPage').addEventListener('click', prevPage);
     document.getElementById('nextPage').addEventListener('click', nextPage);
+    document.getElementById('randomBtn').addEventListener('click', fetchRandom);
   </script>
-</main> 
+</main>

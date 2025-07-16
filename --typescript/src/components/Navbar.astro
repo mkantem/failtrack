@@ -1,26 +1,45 @@
 ---
 import LanguageSwitcher from './LanguageSwitcher';
-import { TranslationProvider, useTranslation } from './TranslationProvider';
+import en from '../locales/en.json';
+import fr from '../locales/fr.json';
+
+export interface Props {
+  lang?: 'en' | 'fr';
+}
+
+const { lang = 'en' } = Astro.props;
+
+const translations = { en, fr };
+
+const t = (key: string): string => {
+  const keys = key.split('.');
+  let value: any = translations[lang];
+  for (const k of keys) {
+    value = value?.[k];
+    if (value === undefined) return key;
+  }
+  return typeof value === 'string' ? value : key;
+};
 
 const links = [
-  { href: '/en', key: 'nav.home' },
-  { href: '/en/submit', key: 'nav.submit' },
-  { href: '/en/browse', key: 'nav.browse' },
+  { href: `/${lang}`, key: 'nav.home' },
+  { href: `/${lang}/submit`, key: 'nav.submit' },
+  { href: `/${lang}/browse`, key: 'nav.browse' },
 ];
 ---
 <nav class="w-full flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-900 shadow">
   <div class="flex items-center gap-4">
-    <a href="/en" class="font-bold text-lg">failtrack</a>
+    <a href={`/${lang}`} class="font-bold text-lg">failtrack</a>
     <ul class="flex gap-4">
       {links.map(link => (
-        <li><a href={link.href} class="hover:underline">{useTranslation().t(link.key)}</a></li>
+        <li><a href={link.href} class="hover:underline">{t(link.key)}</a></li>
       ))}
     </ul>
   </div>
   <div class="flex items-center gap-4">
-    <LanguageSwitcher client:react />
-    <button id="dark-toggle" aria-label={useTranslation().t('nav.darkMode')} class="ml-2 p-2 rounded bg-gray-200 dark:bg-gray-700">
+    <LanguageSwitcher lang={lang} client:load />
+    <button id="dark-toggle" aria-label={t('nav.darkMode')} class="ml-2 p-2 rounded bg-gray-200 dark:bg-gray-700">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"></path></svg>
     </button>
   </div>
-</nav> 
+</nav>
